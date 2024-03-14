@@ -37,9 +37,6 @@ export default function Home() {
   };
 
 
-  
-
-
   // Editer une tâche
   const handleEditTask = (task) => {
     setEditedTask(task);
@@ -59,6 +56,16 @@ export default function Home() {
     setEditedTask(null);
   };
 
+
+  (async () => {
+    try {
+      await dbConnect();
+      console.log('Connexion à la base de données MongoDB établie avec succès');
+  
+    } catch (error) {
+      console.error('Erreur lors de la connexion à la base de données MongoDB :', error);
+    }
+  })();
   return (
     <div>
       <h1>Ma Liste de Tâches</h1>

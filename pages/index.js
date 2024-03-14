@@ -7,6 +7,9 @@ export default function Home() {
     { id: 3, text: "Explorer Vercel pour le déploiement", completed: false }
   ]);
 
+  const [newTask, setNewTask] = useState(""); 
+  const [editedTask, setEditedTask] = useState(null);
+
   const toggleCompletion = (id) => {
     const newTasks = tasks.map(task => {
       if (task.id === id) {
@@ -15,6 +18,45 @@ export default function Home() {
       return task;
     });
     setTasks(newTasks);
+  };
+
+  // Ajouter une tâche
+
+  const handleAddTask = () => {
+    if (newTask.trim() === "") return; 
+    const updatedTasks = [...tasks, { id: tasks.length + 1, text: newTask, completed: false }]; 
+    setTasks(updatedTasks); 
+    setNewTask("");
+  };
+
+
+  // Supprimer une tâche
+  const handleRemoveTask = (id) => {
+    const newTasks = tasks.filter((task) => task.id !== id);
+    setTasks(newTasks);
+  };
+
+
+  
+
+
+  // Editer une tâche
+  const handleEditTask = (task) => {
+    setEditedTask(task);
+    setNewTask(task.text);
+  };
+
+  const handleSaveEditedTask = () => {
+    if (newTask.trim() === "") return;
+    const updatedTasks = tasks.map(task => {
+      if (task.id === editedTask.id) {
+        return { ...task, text: newTask };
+      }
+      return task;
+    });
+    setTasks(updatedTasks);
+    setNewTask("");
+    setEditedTask(null);
   };
 
   return (
@@ -27,9 +69,20 @@ export default function Home() {
             <button onClick={() => toggleCompletion(task.id)}>
               {task.completed ? 'Marquer comme non complétée' : 'Marquer comme complétée'}
             </button>
+            <button onClick={() => handleRemoveTask(task.id)}>Supprimer la tâche</button>
+            <button onClick={() => handleEditTask(task)}>Modifier la tâche</button>
           </li>
         ))}
       </ul>
+
+      <div>
+        <input type="text" value={newTask} onChange={(e) => setNewTask(e.target.value)} />
+        {editedTask ? (
+          <button onClick={handleSaveEditedTask}>Enregistrer la modification</button>
+        ) : (
+          <button onClick={handleAddTask}>Ajouter une tâche</button>
+        )}
+      </div>
     </div>
   );
 }

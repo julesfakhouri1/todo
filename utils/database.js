@@ -2,7 +2,7 @@
 
 import { MongoClient } from 'mongodb';
 
-const MONGODB_URL = 'mongodb+srv://mouelhianais26:<6TRwv6QePvk2CZPR>@cluster0.amlktsc.mongodb.net/todoListApp';
+const MONGODB_URL = 'mongodb+srv://mouelhianais26:6TRwv6QePvk2CZPR@cluster0.amlktsc.mongodb.net/todoListApp';
 const MONGODB_DB = 'todoListApp';
 
 const url = MONGODB_URL;

@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 
 export default function Home() {
   const [tasks, setTasks] = useState([
@@ -10,7 +10,7 @@ export default function Home() {
   const [newTask, setNewTask] = useState(""); 
   const [editedTask, setEditedTask] = useState(null);
 
-  const toggleCompletion = (id) => {
+  const toggleCompletion = async (id) => {
     const newTasks = tasks.map(task => {
       if (task.id === id) {
         return { ...task, completed: !task.completed };
@@ -18,32 +18,38 @@ export default function Home() {
       return task;
     });
     setTasks(newTasks);
+
+    fetch(`http://localhost:3001/todoListApp/tasks/${id}/toggle-completion`, { method: 'PUT' });
   };
 
-  // Ajouter une tâche
-
-  const handleAddTask = () => {
+  const handleAddTask = async () => {
     if (newTask.trim() === "") return; 
     const updatedTasks = [...tasks, { id: tasks.length + 1, text: newTask, completed: false }]; 
     setTasks(updatedTasks); 
     setNewTask("");
+
+    fetch('http://localhost:3001/todoListApp/tasks', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({ text: newTask })
+    });
   };
 
-
-  // Supprimer une tâche
-  const handleRemoveTask = (id) => {
+  const handleRemoveTask = async (id) => {
     const newTasks = tasks.filter((task) => task.id !== id);
     setTasks(newTasks);
+
+    fetch(`http://localhost:3001/todoListApp/tasks/${id}`, { method: 'DELETE' });
   };
 
-
-  // Editer une tâche
   const handleEditTask = (task) => {
     setEditedTask(task);
     setNewTask(task.text);
   };
 
-  const handleSaveEditedTask = () => {
+  const handleSaveEditedTask = async () => {
     if (newTask.trim() === "") return;
     const updatedTasks = tasks.map(task => {
       if (task.id === editedTask.id) {
@@ -54,18 +60,38 @@ export default function Home() {
     setTasks(updatedTasks);
     setNewTask("");
     setEditedTask(null);
+
+    fetch(`http://localhost:3001/todoListApp/tasks/${editedTask.id}`, {
+      method: 'PUT',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({ text: newTask })
+    });
   };
 
-
-  (async () => {
+  const getTasks = async () => {
     try {
-      await dbConnect();
-      console.log('Connexion à la base de données MongoDB établie avec succès');
-  
+      const response = await fetch('http://localhost:3001/todoListApp/tasks');
+      
+      if (!response.ok) {
+        throw new Error('Erreur lors de la récupération des tâches');
+      }
+      
+      const data = await response.json();
+      console.log("Réponse de l'API:", data); // Affichage des données récupérées depuis l'API
+      setTasks(data);
     } catch (error) {
-      console.error('Erreur lors de la connexion à la base de données MongoDB :', error);
+      console.error('Erreur lors de la récupération des tâches:', error);
     }
-  })();
+  };
+  
+
+  useEffect(() => {
+    getTasks();
+  }, []);
+  
+
   return (
     <div>
       <h1>Ma Liste de Tâches</h1>
